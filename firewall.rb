@@ -86,8 +86,6 @@ dest  = "192.168.1.201"
 print "> Setting up port forwarding to #{dest}  "
 ipt_forward_port = { 201 => 22, 8080 => 80 }
 ipt_forward_port.each_pair do |f,t|
-  system("sudo #{IPTABLES} -A INPUT -p #{f} -d #{NETWORK} -j ACCEPT")
-  system("sudo #{IPTABLES} -A INPUT -p tcp --dport #{f} -j ACCEPT")
   system("sudo #{IPTABLES} -A FORWARD -p tcp --dport #{f} -j ACCEPT")
   system("sudo #{IPTABLES} -t nat -A PREROUTING -i #{IFACE_NAME} -p tcp --dport #{f} -j DNAT --to #{dest}:#{t}")
   system("sudo #{IPTABLES} -t nat -A POSTROUTING -p tcp --dport #{t} -j SNAT --to #{IFACE_IP}")
