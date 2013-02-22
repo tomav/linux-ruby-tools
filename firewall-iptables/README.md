@@ -51,8 +51,8 @@ Port forwarding
 
 Test the rules (nothing will be applied)
 
-    ./firewall.rb test
+    ./firewall-iptables.rb test
 
 Apply the rules
 
-    ./firewall.rb apply
+    ./firewall-iptables.rb apply
