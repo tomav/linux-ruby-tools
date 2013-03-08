@@ -20,6 +20,16 @@ ipt_input_ports_protocol  = [47]
 ipt_forward_port          = {
                               "192.168.1.201" => { 201 => 22, 8080 => 80 }
                             }
+ipt_blacklist             = [
+                              "84.54.110.165",
+                              "82.160.245.29",
+                              "14.97.89.98",
+                              "115.118.75.252",
+                              "1.173.245.133",
+                              "122.172.6.74",
+                              "115.119.137.180",
+                              "37.8.194.163"
+]
 
 #
 #
@@ -145,6 +155,12 @@ ipt_forward_port.each do |ip,arr|
     cmd("sudo #{IPTABLES} -t nat -A PREROUTING -i #{IFACE_NAME} -p tcp --dport #{from} -j DNAT --to #{ip}:#{to}")
     cmd("sudo #{IPTABLES} -t nat -A POSTROUTING -p tcp --dport #{to} -j SNAT --to #{IFACE_IP}") 
   end
+end
+confirm("[ OK ]")
+
+label("> Blacklist some ips                                     ")
+ipt_blacklist.each do |ip|
+  cmd("sudo #{IPTABLES}  -A INPUT -s #{ip} -j DROP") 
 end
 confirm("[ OK ]")
 

@@ -47,6 +47,13 @@ Port forwarding
                                   "192.168.1.201" => { 201 => 22, 8080 => 80 }
                                 }
 
+IPs Blacklist
+
+    ipt_blacklist             = [
+                                  "84.54.110.165",
+                                  "82.160.245.29"
+    ]
+
 ## Usage
 
 Test the rules (nothing will be applied)
