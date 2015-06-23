@@ -17,9 +17,10 @@ NETWORK    = "192.168.1.0/24"
 ipt_input_ports_tcp       = [22, 25, 53, 80, 113, 143, 6667]
 ipt_input_ports_udp       = [53, 113]
 ipt_input_ports_protocol  = [47]
-ipt_forward_port          = {
-                              "192.168.1.201" => { 201 => 22, 8080 => 80 }
-                            }
+ipt_forward_port          = [
+                              [ "192.168.1.201", 22, 22, "tcp" ],
+                              [ "192.168.1.201", 53, 53, "udp" ]
+                            ]
 ipt_blacklist             = [
                               "84.54.110.165",
                               "82.160.245.29",
@@ -148,13 +149,11 @@ ipt_input_ports_protocol.each do |f|
 end
 confirm("[ OK ]")
 
-ipt_forward_port.each do |ip,arr|
-  label("> Setting up port forwarding to #{ip}  ")
-  arr.each do |from,to|
-    cmd("sudo #{IPTABLES} -A FORWARD -p tcp --dport #{from} -j ACCEPT")
-    cmd("sudo #{IPTABLES} -t nat -A PREROUTING -i #{IFACE_NAME} -p tcp --dport #{from} -j DNAT --to #{ip}:#{to}")
-    cmd("sudo #{IPTABLES} -t nat -A POSTROUTING -p tcp --dport #{to} -j SNAT --to #{IFACE_IP}") 
-  end
+ipt_forward_port.each do |to_ip, from_port, to_port, protocole|
+  label("> Setting up port forwarding to #{IFACE_IP}:#{from_port} => #{to_ip}:#{to_port} via #{protocole}  ")
+  cmd("sudo #{IPTABLES} -A FORWARD -p #{protocole} --dport #{from_port} -j ACCEPT")
+  cmd("sudo #{IPTABLES} -t nat -A PREROUTING -i #{IFACE_NAME} -p #{protocole} --dport #{from_port} -j DNAT --to #{to_ip}:#{to_port}")
+  cmd("sudo #{IPTABLES} -t nat -A POSTROUTING -p #{protocole} --dport #{to_port} -j SNAT --to #{IFACE_IP}") 
 end
 confirm("[ OK ]")
 
